@@ -9,9 +9,10 @@ source:
   sha256: 942445c3245b22730fd41a67a7c5c231d11cb1b9936b9c0f76334fb7d0b4468c
   patches:
     - fix-dll-name.diff
+    - fix-win-arm64-config.diff
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
