@@ -1,7 +1,13 @@
 @ECHO off
+setlocal EnableDelayedExpansion
 
 set dbg=0
-set machine=x64
+if "%target_platform%" == "win-64" (
+  set machine=x64
+)
+if "%target_platform%" == "win-arm64" (
+  set machine=ARM64
+)
 
 mkdir %LIBRARY_BIN%
 mkdir %LIBRARY_LIB%

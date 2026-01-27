@@ -11,7 +11,7 @@ source:
     - fix-dll-name.diff
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
