@@ -24,17 +24,15 @@ outputs:
       script: build
     requirements:
       build:
-        - if: unix
-          then: gnuconfig
         - ${{ compiler('c') }}
         - ${{ stdlib('c') }}
         - ${{ compiler('cxx') }}
         - if: unix
-          then: make
-        - if: unix
-          then: wget
-        - if: unix
-          then: unzip
+          then:
+            - gnuconfig
+            - make
+            - wget
+            - unzip
 
   - package:
       name: libmpdec
@@ -54,17 +52,13 @@ outputs:
         - ${{ compiler('c') }}
         - ${{ stdlib('c') }}
     tests:
-      - if: unix
-        then:
-          package_contents:
-            lib:
-              - mpdec
-      - if: win
-        then:
-          package_contents:
-            files:
-              exists:
-                - Library/bin/libmpdec-4.dll
+      - package_contents:
+          lib:
+            - if: unix
+              then: mpdec
+          files:
+            - if: win
+              then: Library/bin/libmpdec-4.dll
 
   - package:
       name: libmpdecxx
@@ -88,17 +82,13 @@ outputs:
       run:
         - ${{ pin_subpackage("libmpdec", exact=True) }}
     tests:
-      - if: unix
-        then:
-          package_contents:
-            lib:
-              - mpdec++
-      - if: win
-        then:
-          package_contents:
-            files:
-              exists:
-                - Library/bin/libmpdec++-4.dll
+      - package_contents:
+          lib:
+            - if: unix
+              then: mpdec++
+          files:
+            - if: win
+              then: Library/bin/libmpdec++-4.dll
 
   - package:
       name: libmpdec-devel
@@ -112,13 +102,13 @@ outputs:
         - if: osx
           then: lib/libmpdec.dylib
         - if: unix
-          then: lib/pkgconfig/libmpdec.pc
-        - if: unix
-          then: include/mpdecimal.h
+          then:
+            - lib/pkgconfig/libmpdec.pc
+            - include/mpdecimal.h
         - if: win
-          then: Library/lib/mpdec.lib
-        - if: win
-          then: Library/include/mpdecimal.h
+          then:
+            - Library/lib/mpdec.lib
+            - Library/include/mpdecimal.h
     requirements:
       run:
         - ${{ pin_subpackage("libmpdec", exact=True) }}
@@ -128,17 +118,12 @@ outputs:
       - package_contents:
           include:
             - mpdecimal.h
-      - if: unix
-        then:
-          package_contents:
-            lib:
-              - mpdec
-      - if: win
-        then:
-          package_contents:
-            files:
-              exists:
-                - Library/lib/mpdec.lib
+          lib:
+            - if: unix
+              then: mpdec
+          files:
+            - if: win
+              then: Library/lib/mpdec.lib
 
   - package:
       name: libmpdecxx-devel
@@ -152,13 +137,13 @@ outputs:
         - if: osx
           then: lib/libmpdec++.dylib
         - if: unix
-          then: lib/pkgconfig/libmpdec++.pc
-        - if: unix
-          then: include/decimal.hh
+          then:
+            - lib/pkgconfig/libmpdec++.pc
+            - include/decimal.hh
         - if: win
-          then: Library/lib/mpdec++.lib
-        - if: win
-          then: Library/include/decimal.hh
+          then:
+            - Library/lib/mpdec++.lib
+            - Library/include/decimal.hh
     requirements:
       run:
         - ${{ pin_subpackage("libmpdecxx", exact=True) }}
@@ -169,17 +154,12 @@ outputs:
       - package_contents:
           include:
             - decimal.hh
-      - if: unix
-        then:
-          package_contents:
-            lib:
-              - mpdec++
-      - if: win
-        then:
-          package_contents:
-            files:
-              exists:
-                - Library/lib/mpdec++.lib
+          lib:
+            - if: unix
+              then: mpdec++
+          files:
+            - if: win
+              then: Library/lib/mpdec++.lib
 
 about:
   homepage: https://www.bytereef.org/mpdecimal/index.html
