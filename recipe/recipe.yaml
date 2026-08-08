@@ -128,8 +128,17 @@ outputs:
       - package_contents:
           include:
             - mpdecimal.h
-          lib:
-            - mpdec
+      - if: unix
+        then:
+          package_contents:
+            lib:
+              - mpdec
+      - if: win
+        then:
+          package_contents:
+            files:
+              exists:
+                - Library/lib/mpdec.lib
 
   - package:
       name: libmpdecxx-devel
@@ -160,8 +169,17 @@ outputs:
       - package_contents:
           include:
             - decimal.hh
-          lib:
-            - mpdec++
+      - if: unix
+        then:
+          package_contents:
+            lib:
+              - mpdec++
+      - if: win
+        then:
+          package_contents:
+            files:
+              exists:
+                - Library/lib/mpdec++.lib
 
 about:
   homepage: https://www.bytereef.org/mpdecimal/index.html
