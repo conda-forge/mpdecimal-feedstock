@@ -54,9 +54,17 @@ outputs:
         - ${{ compiler('c') }}
         - ${{ stdlib('c') }}
     tests:
-      - package_contents:
-          lib:
-            - mpdec
+      - if: unix
+        then:
+          package_contents:
+            lib:
+              - mpdec
+      - if: win
+        then:
+          package_contents:
+            files:
+              exists:
+                - Library/bin/libmpdec-4.dll
 
   - package:
       name: libmpdecxx
@@ -80,9 +88,17 @@ outputs:
       run:
         - ${{ pin_subpackage("libmpdec", exact=True) }}
     tests:
-      - package_contents:
-          lib:
-            - mpdec++
+      - if: unix
+        then:
+          package_contents:
+            lib:
+              - mpdec++
+      - if: win
+        then:
+          package_contents:
+            files:
+              exists:
+                - Library/bin/libmpdec++-4.dll
 
   - package:
       name: libmpdec-devel
