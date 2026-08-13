@@ -1,0 +1,172 @@
+schema_version: 1
+
+context:
+  version: "4.0.0"
+
+recipe:
+  name: mpdecimal-split
+  version: ${{ version }}
+
+source:
+  url: https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-${{ version }}.tar.gz
+  sha256: 942445c3245b22730fd41a67a7c5c231d11cb1b9936b9c0f76334fb7d0b4468c
+  patches:
+    - fix-dll-name.diff
+    - fix-win-arm64-config.diff
+
+build:
+  number: 2
+
+outputs:
+  - staging:
+      name: mpdecimal-build
+    build:
+      script: build
+    requirements:
+      build:
+        - ${{ compiler('c') }}
+        - ${{ stdlib('c') }}
+        - ${{ compiler('cxx') }}
+        - if: unix
+          then:
+            - gnuconfig
+            - make
+            - wget
+            - unzip
+
+  - package:
+      name: libmpdec
+    inherit:
+      from: mpdecimal-build
+      run_exports: false
+    build:
+      files:
+        - if: linux
+          then: lib/libmpdec.so.*
+        - if: osx
+          then: lib/libmpdec.*.dylib
+        - if: win
+          then: Library/bin/libmpdec-*.dll
+    requirements:
+      build:
+        - ${{ compiler('c') }}
+        - ${{ stdlib('c') }}
+    tests:
+      - package_contents:
+          lib:
+            - if: unix
+              then: mpdec
+          files:
+            - if: win
+              then: Library/bin/libmpdec-4.dll
+
+  - package:
+      name: libmpdecxx
+    inherit:
+      from: mpdecimal-build
+      run_exports: false
+    build:
+      files:
+        - if: linux
+          then: lib/libmpdec++.so.*
+        - if: osx
+          then: lib/libmpdec++.*.dylib
+        - if: win
+          then: Library/bin/libmpdec++-*.dll
+    requirements:
+      build:
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+      host:
+        - ${{ pin_subpackage("libmpdec", exact=True) }}
+      run:
+        - ${{ pin_subpackage("libmpdec", exact=True) }}
+    tests:
+      - package_contents:
+          lib:
+            - if: unix
+              then: mpdec++
+          files:
+            - if: win
+              then: Library/bin/libmpdec++-4.dll
+
+  - package:
+      name: libmpdec-devel
+    inherit:
+      from: mpdecimal-build
+      run_exports: false
+    build:
+      files:
+        - if: linux
+          then: lib/libmpdec.so
+        - if: osx
+          then: lib/libmpdec.dylib
+        - if: unix
+          then:
+            - lib/pkgconfig/libmpdec.pc
+            - include/mpdecimal.h
+        - if: win
+          then:
+            - Library/lib/mpdec.lib
+            - Library/include/mpdecimal.h
+    requirements:
+      run:
+        - ${{ pin_subpackage("libmpdec", exact=True) }}
+      run_exports:
+        - ${{ pin_subpackage("libmpdec") }}
+    tests:
+      - package_contents:
+          include:
+            - mpdecimal.h
+          lib:
+            - if: unix
+              then: mpdec
+          files:
+            - if: win
+              then: Library/lib/mpdec.lib
+
+  - package:
+      name: libmpdecxx-devel
+    inherit:
+      from: mpdecimal-build
+      run_exports: false
+    build:
+      files:
+        - if: linux
+          then: lib/libmpdec++.so
+        - if: osx
+          then: lib/libmpdec++.dylib
+        - if: unix
+          then:
+            - lib/pkgconfig/libmpdec++.pc
+            - include/decimal.hh
+        - if: win
+          then:
+            - Library/lib/mpdec++.lib
+            - Library/include/decimal.hh
+    requirements:
+      run:
+        - ${{ pin_subpackage("libmpdecxx", exact=True) }}
+        - ${{ pin_subpackage("libmpdec-devel", exact=True) }}
+      run_exports:
+        - ${{ pin_subpackage("libmpdecxx") }}
+    tests:
+      - package_contents:
+          include:
+            - decimal.hh
+          lib:
+            - if: unix
+              then: mpdec++
+          files:
+            - if: win
+              then: Library/lib/mpdec++.lib
+
+about:
+  homepage: https://www.bytereef.org/mpdecimal/index.html
+  summary: A package for correctly-rounded arbitrary precision decimal floating point arithmetic
+  license: BSD-2-Clause
+  license_file: COPYRIGHT.txt
+
+extra:
+  recipe-maintainers:
+    - isuruf
